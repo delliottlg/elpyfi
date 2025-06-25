@@ -1,0 +1,43 @@
+# Service repositories (managed separately)
+services/*/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets and configs
+config/secrets.yaml
+config/prod.yaml
+.env
+.env.*
+
+# Logs
+*.log
+logs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# MCP build artifacts
+dist/
+build/
+*.egg-info/

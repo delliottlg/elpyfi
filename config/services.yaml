@@ -1,0 +1,86 @@
+# Service configuration for PM Claude
+# Defines where to find services and their dependencies
+
+services:
+  elpyfi-core:
+    name: "Core Trading Engine"
+    path: "../services/elpyfi-core/elpyfi-engine"
+    repo: "github.com/your-username/elpyfi-core"
+    startup:
+      command: "python engine.py"
+      working_dir: "."
+      env_prefix: "CORE_"
+    health:
+      type: "http"
+      endpoint: "http://localhost:9001/health"
+      interval: 30
+    requires_secrets:
+      - alpaca_api_key
+      - alpaca_secret_key
+      - database_url
+    startup_order: 2
+
+  elpyfi-ai:
+    name: "AI Analysis Service"
+    path: "../services/elpyfi-ai"
+    repo: "github.com/your-username/elpyfi-ai"
+    startup:
+      command: "python main.py"
+      working_dir: "."
+      env_prefix: "AI_"
+    health:
+      type: "http"
+      endpoint: "http://localhost:9000/health"
+      interval: 30
+    requires_secrets:
+      - anthropic_api_key
+      - database_url
+    startup_order: 3
+    depends_on:
+      - elpyfi-core
+
+  elpyfi-api:
+    name: "REST/WebSocket API"
+    path: "../services/elpyfi-api"
+    repo: "github.com/your-username/elpyfi-api"
+    startup:
+      command: "python -m elpyfi_api.main"
+      working_dir: "src"
+      env_prefix: "API_"
+    health:
+      type: "http"
+      endpoint: "http://localhost:9002/health"
+      interval: 30
+    requires_secrets:
+      - database_url
+      - api_keys
+    startup_order: 4
+    depends_on:
+      - elpyfi-core
+
+  elpyfi-dashboard:
+    name: "Web Dashboard"
+    path: "../services/elpyfi-dashboard"
+    repo: "github.com/your-username/elpyfi-dashboard"
+    startup:
+      command: "npm run dev"
+      working_dir: "."
+      env_prefix: "NEXT_PUBLIC_"
+    health:
+      type: "http"
+      endpoint: "http://localhost:9003"
+      interval: 30
+    requires_secrets:
+      - api_base_url
+    startup_order: 5
+    depends_on:
+      - elpyfi-api
+
+  postgresql:
+    name: "PostgreSQL Database"
+    external: true
+    startup_order: 1
+    health:
+      type: "postgresql"
+      connection_string: "${DATABASE_URL}"
+      interval: 10
