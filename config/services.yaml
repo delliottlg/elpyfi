@@ -4,7 +4,7 @@
 services:
   elpyfi-core:
     name: "Core Trading Engine"
-    path: "../services/elpyfi-core/elpyfi-engine"
+    path: "./services/elpyfi-core/elpyfi-engine"
     repo: "github.com/your-username/elpyfi-core"
     startup:
       command: "python engine.py"
@@ -22,7 +22,7 @@ services:
 
   elpyfi-ai:
     name: "AI Analysis Service"
-    path: "../services/elpyfi-ai"
+    path: "./services/elpyfi-ai"
     repo: "github.com/your-username/elpyfi-ai"
     startup:
       command: "python main.py"
@@ -41,7 +41,7 @@ services:
 
   elpyfi-api:
     name: "REST/WebSocket API"
-    path: "../services/elpyfi-api"
+    path: "./services/elpyfi-api"
     repo: "github.com/your-username/elpyfi-api"
     startup:
       command: "python -m elpyfi_api.main"
@@ -60,7 +60,7 @@ services:
 
   elpyfi-dashboard:
     name: "Web Dashboard"
-    path: "../services/elpyfi-dashboard"
+    path: "./services/elpyfi-dashboard"
     repo: "github.com/your-username/elpyfi-dashboard"
     startup:
       command: "npm run dev"

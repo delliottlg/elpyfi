@@ -15,10 +15,10 @@ elpyfi-pm-claude/
 ```
 
 ## Managed Services
-1. **elpyfi-core**: Core trading engine (not cloned)
-2. **elpyfi-ai**: AI signal analysis (not cloned)
-3. **elpyfi-api**: REST/WebSocket API (not cloned)
-4. **elpyfi-dashboard**: Web UI (not cloned)
+1. **elpyfi-core**: Core trading engine ✓ (moved to services/)
+2. **elpyfi-ai**: AI signal analysis ✓ (moved to services/)
+3. **elpyfi-api**: REST/WebSocket API ✓ (moved to services/)
+4. **elpyfi-dashboard**: Web UI ✓ (moved to services/)
 
 ## Next Steps
 1. Implement basic service orchestration
