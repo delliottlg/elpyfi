@@ -1,0 +1,6 @@
+# Consolidated requirements file that includes everything
+# This installs all dependencies for all services
+
+-r base.txt
+-r ai.txt
+-r dev.txt

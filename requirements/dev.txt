@@ -1,0 +1,15 @@
+# Development and testing tools
+# Shared across all services for consistency
+
+# Testing
+pytest==8.4.1
+pytest-asyncio==1.0.0
+
+# Code quality
+black==25.1.0
+ruff==0.12.0
+mypy==1.16.1
+
+# Additional dev tools
+ipython  # For interactive debugging
+pre-commit  # For git hooks

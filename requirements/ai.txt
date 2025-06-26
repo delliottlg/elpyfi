@@ -1,0 +1,6 @@
+# AI service specific requirements
+# These are in addition to base.txt
+
+anthropic==0.40.0
+rich==13.9.4
+matplotlib==3.9.3

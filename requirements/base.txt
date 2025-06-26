@@ -1,0 +1,21 @@
+# Base requirements shared by all services
+# Using the latest versions from our services
+
+# Core dependencies
+requests==2.32.3
+psycopg2-binary==2.9.10
+python-dotenv==1.1.1
+
+# FastAPI ecosystem (using latest versions from api service)
+fastapi==0.115.13
+uvicorn[standard]==0.34.3
+pydantic==2.11.7
+pydantic-settings==2.10.1
+
+# Async libraries
+aiohttp==3.11.10
+aiofiles==24.1.0
+httpx==0.28.1
+
+# Database
+asyncpg==0.30.0  # For async PostgreSQL operations

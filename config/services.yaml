@@ -19,6 +19,10 @@ services:
       - alpaca_secret_key
       - database_url
     startup_order: 2
+    test:
+      command: "./run_test.sh"
+      working_dir: "."
+      fallback_command: "python test_engine.py"
 
   elpyfi-ai:
     name: "AI Analysis Service"
@@ -38,6 +42,9 @@ services:
     startup_order: 3
     depends_on:
       - elpyfi-core
+    test:
+      command: "python -m pytest tests/ -v"
+      working_dir: "."
 
   elpyfi-api:
     name: "REST/WebSocket API"
@@ -57,6 +64,9 @@ services:
     startup_order: 4
     depends_on:
       - elpyfi-core
+    test:
+      command: "python -m pytest tests/ -v"
+      working_dir: "."
 
   elpyfi-dashboard:
     name: "Web Dashboard"
@@ -75,6 +85,10 @@ services:
     startup_order: 5
     depends_on:
       - elpyfi-api
+    test:
+      command: "npm run lint"
+      working_dir: "."
+      note: "No tests configured yet, running lint instead"
 
   postgresql:
     name: "PostgreSQL Database"
