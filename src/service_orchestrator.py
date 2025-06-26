@@ -19,6 +19,7 @@ from datetime import datetime
 import logging
 
 from secrets_manager import SecretsManager
+from health_monitor import HealthMonitor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,6 +50,7 @@ class ServiceOrchestrator:
         self.services: Dict[str, ServiceConfig] = {}
         self.secrets_manager = SecretsManager(base_path / "config")
         self.python_cmd = str(base_path / "venv/bin/python")
+        self.health_monitor = HealthMonitor(self)
         
     def load_config(self):
         """Load service configurations"""

@@ -1,43 +1,79 @@
 # PM Claude System Context
 
-## Current Status
-- **Last Updated**: 2025-01-25
-- **Status**: Shared Python 3.11 venv configured
-- **Services**: All moved into services/ directory
-- **Test Status**: 
-  - elpyfi-core: ✅ PASSED
-  - elpyfi-ai: ❌ 1 test failing (PDT logic)
-  - elpyfi-api: ✅ PASSED (no tests)
-  - elpyfi-dashboard: ❌ Lint warnings
+*Last Updated: 2025-06-25 18:26:24*
 
-## Project Structure
+## System Status
+- **Services Running**: 0/4
+- **Overall Health**: ✅ Healthy
+- **Environment**: development
+- **Python Version**: 3.11.13
+- **Shared venv**: /Users/d/Documents/projects/elpyfi-pm-claude/venv
+
+## Services Overview
+
+| Service | Status | PID | Uptime | Memory | Health |
+|---------|--------|-----|--------|--------|--------|
+| Core Trading Engine | stopped | - | - | - | ✅ |
+| AI Analysis Service | stopped | - | - | - | ✅ |
+| REST/WebSocket API | stopped | - | - | - | ✅ |
+| Web Dashboard | stopped | - | - | - | ✅ |
+
+## Recent Events
+- System initialized
+- Services configured with shared Python 3.11 environment
+- MCP server available for natural language control
+
+## Configuration
+- **Config Directory**: `config/`
+- **Services Config**: `config/services.yaml`
+- **Secrets**: `config/secrets.yaml` (git-ignored)
+
+## Available Commands
+
+### CLI:
+```bash
+./pm-claude start|stop|status|restart [services]
+./src/test_runner.py  # Run all tests
 ```
-elpyfi-pm-claude/
-├── config/              # Service and secrets configuration
-├── src/                 # PM Claude implementation
-├── services/            # Managed service repositories
-└── mcp/                 # MCP server implementation
+
+### MCP (Natural Language):
+- "Start the trading system"
+- "Show me service status"
+- "Run tests for the AI service"
+- "Stop all services"
+
+## Architecture
+```
+PM Claude
+├── Service Orchestrator (process management)
+├── Secrets Manager (config distribution)
+├── Health Monitor (auto-recovery)
+├── Test Runner (unified testing)
+├── MCP Server (natural language)
+└── CLAUDE.md Updater (context maintenance)
 ```
 
-## Managed Services
-1. **elpyfi-core**: Core trading engine ✓ (moved to services/)
-2. **elpyfi-ai**: AI signal analysis ✓ (moved to services/)
-3. **elpyfi-api**: REST/WebSocket API ✓ (moved to services/)
-4. **elpyfi-dashboard**: Web UI ✓ (moved to services/)
+## Repository Information
+- **Current Branch**: main
+- **Last Commit**: e0489327 - Implement MCP server for natural language control
 
-## Next Steps
-1. Implement basic service orchestration
-2. Create MCP server structure
-3. Build health monitoring system
-4. Implement secrets distribution
+- Created MCP server with 7 tools:
+  - start_services: Start all or specific services
+  - stop_services: Stop all or specific services
+  - service_status: Get status, PID, uptime, memory
+  - run_tests: Run tests for services
+  - view_logs: View service logs (placeholder)
+  - reload_config: Reload configuration files
+  - list_services: Show available services
 
-## Configuration Files
-- `config/services.yaml`: Service definitions and dependencies
-- `config/secrets.yaml`: Sensitive configuration (git-ignored)
-- `.gitignore`: Excludes service repos and secrets
+- Added mcp-pm-claude launcher script
+- Created mcp.json configuration
+- Added comprehensive MCP usage documentation
+- Total: ~280 lines of clean, async MCP code
 
-## Key Design Decisions
-- Using Option C: Independent repos with PM config
-- Services live in `services/` subdirectory for Claude Code access
-- Git ignores all service repositories
-- MCP server implementation for natural language control
+Now PM Claude can be controlled via natural language in Claude Desktop/CLI\!
+
+🤖 Generated with [Claude Code](https://claude.ai/code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>
+- **Modified Files**: 1
