@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "pm-claude": {
+      "command": "python",
+      "args": ["-m", "src.mcp_server"],
+      "cwd": ".",
+      "env": {
+        "PYTHONPATH": "."
+      }
+    }
+  }
+}

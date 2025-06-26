@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Launch PM Claude MCP server
+
+# Get the directory of this script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Use our venv Python
+"$DIR/venv/bin/python" -m src.mcp_server

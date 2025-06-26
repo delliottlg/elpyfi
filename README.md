@@ -38,23 +38,33 @@ elpyfi-pm-claude/
 
 ## Usage
 
-### As MCP Tool
+### Command Line Interface
 ```bash
 # Start all services
-pm-claude start all
+./pm-claude start
+
+# Start specific services
+./pm-claude start elpyfi-core elpyfi-ai
 
 # Check status
-pm-claude status
+./pm-claude status
 
-# View logs
-pm-claude logs --service=ai
+# Stop all services
+./pm-claude stop
+
+# Restart services
+./pm-claude restart
 ```
 
-### Natural Language Commands
-- "Start trading system in dev mode"
-- "Show me the current status"
-- "Why is the AI service not responding?"
-- "Shutdown all services"
+### MCP Integration (Natural Language)
+
+Configure PM Claude as an MCP server in Claude Desktop or CLI (see docs/mcp-usage.md), then use natural language:
+
+- "Start the trading system"
+- "Show me the current status of all services"
+- "Run tests for the AI service"
+- "Stop everything"
+- "Which services are currently running?"
 
 ## Services Managed
 
