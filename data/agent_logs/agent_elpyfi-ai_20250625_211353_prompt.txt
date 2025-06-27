@@ -1,0 +1,10 @@
+You are working on the elpyfi-ai service.
+
+Task: Update Pydantic .dict() to .model_dump() for v2 compatibility
+\nThis relates to issue #59520bf4
+
+Please proceed with fixing this issue. Make sure to:
+1. Read relevant files first
+2. Make the necessary changes
+3. Test your changes if possible
+4. Provide a summary of what you did

@@ -1,0 +1,12 @@
+You are working on the elpyfi-dashboard service.
+
+Task: Add error boundary components to prevent full app crashes
+
+
+This relates to issue #677c187a
+
+Please proceed with fixing this issue. Make sure to:
+1. Read relevant files first
+2. Make the necessary changes
+3. Test your changes if possible
+4. Provide a summary of what you did

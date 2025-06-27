@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
-RUN npm ci --only=production
+RUN npm install --omit=dev
 
 # Copy application code
 COPY . .
@@ -17,7 +17,7 @@ RUN adduser -D -u 1000 elpyfi && chown -R elpyfi:elpyfi /app
 USER elpyfi
 
 # Expose port
-EXPOSE 9003
+EXPOSE 8080
 
 # Run production server
 CMD ["npm", "start"]

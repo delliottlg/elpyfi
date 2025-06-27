@@ -6,6 +6,7 @@ kill_timeout = 5
 
 [build]
   dockerfile = "services/elpyfi-api/Dockerfile"
+  context = "services/elpyfi-api"
 
 [env]
   PORT = "8080"

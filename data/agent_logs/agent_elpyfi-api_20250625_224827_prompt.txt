@@ -1,0 +1,12 @@
+You are working on the elpyfi-api service.
+
+Task: Fix Pydantic v2 deprecation warning in config.py
+
+
+This relates to issue #64885e18
+
+Please proceed with fixing this issue. Make sure to:
+1. Read relevant files first
+2. Make the necessary changes
+3. Test your changes if possible
+4. Provide a summary of what you did

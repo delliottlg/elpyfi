@@ -1,0 +1,12 @@
+You are working on the elpyfi-core service.
+
+Task: Improve database schema mismatch error handling
+
+
+This relates to issue #0d682431
+
+Please proceed with fixing this issue. Make sure to:
+1. Read relevant files first
+2. Make the necessary changes
+3. Test your changes if possible
+4. Provide a summary of what you did

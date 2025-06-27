@@ -1,0 +1,11 @@
+You are working on the elpyfi-api service.
+
+Task: Remove old local venv and use PM Claude's shared environment
+\nThis relates to issue #5f943e8d
+
+IMPORTANT: Before making any changes, please:
+1. Read the relevant files to understand the current implementation
+2. Create a plan for fixing this issue
+3. Present your plan and wait for approval before proceeding
+
+Start by analyzing the issue and creating a detailed plan.

@@ -1,0 +1,12 @@
+You are working on the elpyfi-api service.
+
+Task: Add a comment '# Real-time test!' to the top of config.py, then print 'Step 1 done', then 
+  add another comment '# Still working...' after 2 seconds, then print 'Step 2 done', then add a final comment '# All done!' 
+  and print 'Task completed!'
+
+
+Please proceed with fixing this issue. Make sure to:
+1. Read relevant files first
+2. Make the necessary changes
+3. Test your changes if possible
+4. Provide a summary of what you did

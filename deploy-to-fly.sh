@@ -3,6 +3,15 @@
 
 echo "🚀 Deploying ElPyFi to Fly.io..."
 
+# Load environment variables from .env.fly
+if [ -f .env.fly ]; then
+    export $(cat .env.fly | grep -v '^#' | xargs)
+    echo "✅ Loaded secrets from .env.fly"
+else
+    echo "❌ .env.fly not found! Create it with your API keys."
+    exit 1
+fi
+
 # Install flyctl if not installed
 if ! command -v flyctl &> /dev/null; then
     echo "Installing flyctl..."
@@ -12,9 +21,8 @@ fi
 # Ensure we're logged in
 flyctl auth login
 
-# Create Postgres cluster first
-echo "📊 Creating PostgreSQL database..."
-flyctl postgres create elpyfi-db --region sjc || echo "Database might already exist"
+# Skip Postgres for now (Fly.io Postgres is broken in transition)
+echo "⏭️  Skipping PostgreSQL - deploying services without database for now..."
 
 # Create and deploy each app
 for service in core ai api dashboard; do
@@ -24,10 +32,8 @@ for service in core ai api dashboard; do
     # Create app if it doesn't exist
     flyctl apps create elpyfi-$service --machines || echo "App elpyfi-$service already exists"
     
-    # Attach to database (except dashboard)
-    if [ "$service" != "dashboard" ]; then
-        flyctl postgres attach elpyfi-db --app elpyfi-$service || echo "Already attached"
-    fi
+    # Skip database attachment for now
+    echo "⏭️  Skipping database attachment (PostgreSQL will be added later)"
     
     # Set secrets based on service
     case $service in
@@ -56,9 +62,25 @@ for service in core ai api dashboard; do
             ;;
     esac
     
-    # Deploy
+    # Deploy from service directory
     echo "🚀 Deploying elpyfi-$service..."
-    flyctl deploy --config fly.$service.toml --app elpyfi-$service
+    case $service in
+        core)
+            cd services/elpyfi-core/elpyfi-engine
+            flyctl deploy --config ../../../fly.$service.toml --app elpyfi-$service
+            cd ../../../
+            ;;
+        dashboard)
+            cd services/elpyfi-dashboard
+            flyctl deploy --config ../../fly.$service.toml --app elpyfi-$service
+            cd ../../
+            ;;
+        *)
+            cd services/elpyfi-$service
+            flyctl deploy --config ../../fly.$service.toml --app elpyfi-$service
+            cd ../../
+            ;;
+    esac
 done
 
 echo ""

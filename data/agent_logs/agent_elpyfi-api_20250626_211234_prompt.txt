@@ -1,0 +1,10 @@
+You are working on the elpyfi-api service.
+
+Task: Add a comment '# PM Claude was here - test agent dispatch' at the top of main.py right after the imports
+
+
+Please proceed with fixing this issue. Make sure to:
+1. Read relevant files first
+2. Make the necessary changes
+3. Test your changes if possible
+4. Provide a summary of what you did
