@@ -1,0 +1,41 @@
+{
+  "$schema": "https://railway.app/railway.schema.json",
+  "services": {
+    "core": {
+      "source": {
+        "repo": ".",
+        "context": "services/elpyfi-core/elpyfi-engine"
+      },
+      "build": {
+        "builder": "DOCKERFILE"
+      }
+    },
+    "ai": {
+      "source": {
+        "repo": ".",
+        "context": "services/elpyfi-ai"
+      },
+      "build": {
+        "builder": "DOCKERFILE"
+      }
+    },
+    "api": {
+      "source": {
+        "repo": ".",
+        "context": "services/elpyfi-api"
+      },
+      "build": {
+        "builder": "DOCKERFILE"
+      }
+    },
+    "dashboard": {
+      "source": {
+        "repo": ".",
+        "context": "services/elpyfi-dashboard"
+      },
+      "build": {
+        "builder": "DOCKERFILE"
+      }
+    }
+  }
+}
