@@ -1,0 +1,11 @@
+[phases.setup]
+nixPkgs = ["python311", "postgresql"]
+
+[phases.install]
+cmds = ["echo 'This is the root - deploy services from their subdirectories'"]
+
+[phases.build]
+cmds = ["echo 'No build needed at root level'"]
+
+[start]
+cmd = "echo 'Please deploy individual services from their directories'"

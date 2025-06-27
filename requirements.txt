@@ -1,0 +1,3 @@
+# This file exists to help Railway detect this as a Python project
+# Actual requirements are in each service's directory
+click==8.1.7
