@@ -62,23 +62,17 @@ for service in core ai api dashboard; do
             ;;
     esac
     
-    # Deploy from service directory
+    # Deploy with proper context
     echo "🚀 Deploying elpyfi-$service..."
     case $service in
         core)
-            cd services/elpyfi-core/elpyfi-engine
-            flyctl deploy --config ../../../fly.$service.toml --app elpyfi-$service
-            cd ../../../
+            flyctl deploy services/elpyfi-core/elpyfi-engine --config fly.$service.toml --app elpyfi-$service
             ;;
         dashboard)
-            cd services/elpyfi-dashboard
-            flyctl deploy --config ../../fly.$service.toml --app elpyfi-$service
-            cd ../../
+            flyctl deploy services/elpyfi-dashboard --config fly.$service.toml --app elpyfi-$service
             ;;
         *)
-            cd services/elpyfi-$service
-            flyctl deploy --config ../../fly.$service.toml --app elpyfi-$service
-            cd ../../
+            flyctl deploy services/elpyfi-$service --config fly.$service.toml --app elpyfi-$service
             ;;
     esac
 done

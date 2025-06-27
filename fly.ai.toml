@@ -5,8 +5,7 @@ kill_signal = "SIGINT"
 kill_timeout = 5
 
 [build]
-  dockerfile = "services/elpyfi-ai/Dockerfile"
-  context = "services/elpyfi-ai"
+  dockerfile = "Dockerfile"
 
 [env]
   PORT = "8080"
