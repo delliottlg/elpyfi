@@ -1,0 +1,108 @@
+services:
+  # PostgreSQL Database
+  - type: pserv
+    name: elpyfi-db
+    runtime: image
+    image:
+      url: docker.io/library/postgres:15
+    disk:
+      name: postgres-data
+      mountPath: /var/lib/postgresql/data
+      sizeGB: 1
+    envVars:
+      - key: POSTGRES_DB
+        value: elpyfi
+      - key: POSTGRES_USER
+        value: elpyfi
+      - key: POSTGRES_PASSWORD
+        generateValue: true
+
+  # Core Trading Engine
+  - type: worker
+    name: elpyfi-core
+    runtime: python
+    rootDirectory: services/elpyfi-core/elpyfi-engine
+    buildCommand: pip install -r requirements.txt
+    startCommand: python engine.py
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: elpyfi-db
+          property: connectionString
+      - key: CORE_ALPACA_API_KEY
+        sync: false  # Add in dashboard
+      - key: CORE_ALPACA_SECRET_KEY
+        sync: false  # Add in dashboard
+      - key: CORE_ALPACA_BASE_URL
+        value: https://paper-api.alpaca.markets
+
+  # AI Analysis Service
+  - type: web
+    name: elpyfi-ai
+    runtime: python
+    rootDirectory: services/elpyfi-ai
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: elpyfi-db
+          property: connectionString
+      - key: AI_ANTHROPIC_API_KEY
+        sync: false  # Add in dashboard
+      - key: AI_OPENAI_API_KEY
+        sync: false  # Add in dashboard
+      - key: PORT
+        value: 9000
+      - key: HOST
+        value: 0.0.0.0
+
+  # REST/WebSocket API
+  - type: web
+    name: elpyfi-api
+    runtime: python
+    rootDirectory: services/elpyfi-api
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m src.elpyfi_api.main
+    envVars:
+      - key: DATABASE_URL
+        fromService:
+          type: pserv
+          name: elpyfi-db
+          property: connectionString
+      - key: ELPYFI_API_KEYS
+        value: '["dashboard-api-key-123", "mobile-app-key-456"]'
+      - key: PORT
+        value: 9002
+      - key: HOST
+        value: 0.0.0.0
+
+  # Web Dashboard
+  - type: web
+    name: elpyfi-dashboard
+    runtime: node
+    rootDirectory: services/elpyfi-dashboard
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: https://elpyfi-api.onrender.com
+      - key: NEXT_PUBLIC_WEBSOCKET_URL
+        value: wss://elpyfi-api.onrender.com
+      - key: PORT
+        value: 9003
+
+# Environment groups for shared secrets
+envVarGroups:
+  - name: elpyfi-secrets
+    envVars:
+      - key: ALPACA_API_KEY
+        sync: false  # Add in dashboard
+      - key: ALPACA_SECRET_KEY
+        sync: false  # Add in dashboard
+      - key: ANTHROPIC_API_KEY
+        sync: false  # Add in dashboard
+      - key: OPENAI_API_KEY
+        sync: false  # Add in dashboard
