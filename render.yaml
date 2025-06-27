@@ -1,21 +1,10 @@
+databases:
+  - name: elpyfi-db
+    databaseName: elpyfi
+    user: elpyfi
+    plan: free
+
 services:
-  # PostgreSQL Database
-  - type: pserv
-    name: elpyfi-db
-    runtime: image
-    image:
-      url: docker.io/library/postgres:15
-    disk:
-      name: postgres-data
-      mountPath: /var/lib/postgresql/data
-      sizeGB: 1
-    envVars:
-      - key: POSTGRES_DB
-        value: elpyfi
-      - key: POSTGRES_USER
-        value: elpyfi
-      - key: POSTGRES_PASSWORD
-        generateValue: true
 
   # Core Trading Engine
   - type: worker
@@ -26,8 +15,7 @@ services:
     startCommand: python engine.py
     envVars:
       - key: DATABASE_URL
-        fromService:
-          type: pserv
+        fromDatabase:
           name: elpyfi-db
           property: connectionString
       - key: CORE_ALPACA_API_KEY
@@ -46,8 +34,7 @@ services:
     startCommand: python main.py
     envVars:
       - key: DATABASE_URL
-        fromService:
-          type: pserv
+        fromDatabase:
           name: elpyfi-db
           property: connectionString
       - key: AI_ANTHROPIC_API_KEY
@@ -68,8 +55,7 @@ services:
     startCommand: python -m src.elpyfi_api.main
     envVars:
       - key: DATABASE_URL
-        fromService:
-          type: pserv
+        fromDatabase:
           name: elpyfi-db
           property: connectionString
       - key: ELPYFI_API_KEYS
