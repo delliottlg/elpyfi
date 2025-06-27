@@ -1,6 +1,6 @@
 # PM Claude
 
-Service orchestrator that dispatches Claude agents to fix issues.
+Service orchestrator that dispatches Claude agents to fix issues. (ignore)
 
 ## Commands
 
