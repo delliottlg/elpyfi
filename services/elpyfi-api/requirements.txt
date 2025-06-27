@@ -1,0 +1,26 @@
+# Core API Framework
+fastapi==0.115.13
+uvicorn[standard]==0.34.3
+
+# Database
+asyncpg==0.30.0
+
+# Configuration & Validation
+pydantic==2.11.7
+pydantic-settings==2.10.1
+python-dotenv==1.1.1
+
+# Async File Operations
+aiofiles==24.1.0
+
+# Development Tools
+pytest==8.4.1
+pytest-asyncio==1.0.0
+black==25.1.0
+ruff==0.12.0
+mypy==1.16.1
+
+# Documentation (optional)
+# mkdocs==1.5.3
+# mkdocs-material==9.5.3
+# mkdocstrings[python]==0.24.0

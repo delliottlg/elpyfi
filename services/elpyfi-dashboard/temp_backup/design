@@ -1,0 +1,96 @@
+⏺ elPyFi Dashboard - Design Document
+
+  Overview
+
+  Read-only web UI. Shows positions, signals, performance. No
+  trading controls.
+
+  Tech Stack
+
+  - Next.js - React with server-side rendering
+  - TailwindCSS - Utility-first styling
+  - SWR - Data fetching with caching
+  - Chart.js - Simple charts
+
+  Structure
+
+  elpyfi-dashboard/
+  ├── pages/
+  │   ├── index.tsx        # Main dashboard
+  │   ├── strategies.tsx   # Strategy details
+  │   └── analytics.tsx    # Performance charts
+  ├── components/
+  │   ├── PositionCard.tsx
+  │   ├── SignalFeed.tsx
+  │   └── PDTStatus.tsx
+  ├── lib/
+  │   └── api.ts          # API client
+  └── styles/
+      └── globals.css
+
+  Key Components
+
+  Main Dashboard (index.tsx)
+
+  export default function Dashboard() {
+    const { data: positions } = useSWR('/api/positions')
+    const { data: signals } = useSWR('/api/signals/recent')
+    const { data: pdt } = useSWR('/api/pdt/status')
+
+    return (
+      <div className="grid grid-cols-12 gap-4">
+        <div className="col-span-8">
+          <PositionsList positions={positions} />
+          <SignalFeed signals={signals} />
+        </div>
+        <div className="col-span-4">
+          <PDTStatus {...pdt} />
+          <PerformanceCard />
+        </div>
+      </div>
+    )
+  }
+
+  WebSocket Integration
+
+  // Real-time updates
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8000/ws')
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+
+      if (data.type === 'position.opened') {
+        // Update positions
+        mutate('/api/positions')
+      }
+    }
+
+    return () => ws.close()
+  }, [])
+
+  Key Features
+
+  1. Real-time updates via WebSocket
+  2. Mobile responsive
+  3. Dark mode (trading aesthetic)
+  4. No trading buttons (read-only)
+  5. Performance charts (daily/weekly/monthly)
+
+  Deployment
+
+  FROM node:18-alpine
+  WORKDIR /app
+  COPY . .
+  RUN npm install && npm run build
+  CMD ["npm", "start"]
+
+  Why This Stack
+
+  - Next.js: Full-stack React, easy deployment
+  - TypeScript: Catch errors early
+  - SWR: Handles caching, revalidation, focus refetching
+  - Tailwind: Rapid UI development
+  - Vercel: One-click deploy
+
+  Total: ~1000 lines for a clean, real-time dashboard.

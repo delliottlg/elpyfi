@@ -1,0 +1,13 @@
+# ElPyFi API Configuration
+
+# Database
+ELPYFI_DATABASE_URL=postgresql://elpyfi:password@localhost/elpyfi
+
+# API Keys (comma-separated)
+ELPYFI_API_KEYS=
+
+# CORS Origins (comma-separated)
+ELPYFI_CORS_ORIGINS=http://localhost:3000
+
+# Server Port
+ELPYFI_PORT=9001

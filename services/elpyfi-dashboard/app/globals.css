@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #fafafa;
+    --card: #1a1a1a;
+    --card-foreground: #fafafa;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-hover: rgba(255, 255, 255, 0.2);
+    --accent: #3b82f6;
+    --accent-foreground: #ffffff;
+    --muted: #2a2a2a;
+    --muted-foreground: #a8a8a8;
+    --subtle: rgba(255, 255, 255, 0.06);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    background-image: 
+      radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(180deg, var(--background) 0%, #0f0f0f 100%);
+    background-size: 24px 24px, 100% 100%;
+    background-position: 0 0, 0 0;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .border-thin {
+    border-width: 1px;
+    border-color: var(--border);
+  }
+  
+  .border-thin-hover:hover {
+    border-color: var(--border-hover);
+  }
+  
+  .bg-card {
+    background-color: var(--card);
+  }
+  
+  .text-muted {
+    color: var(--muted-foreground);
+  }
+  
+  .bg-muted {
+    background-color: var(--muted);
+  }
+}

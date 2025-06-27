@@ -1,0 +1,201 @@
+
+  elPyFi Arbiter - Design Document
+
+  Overview
+
+  Simple service that tracks PDT usage and enforces the 3 day
+  trades/week limit. That's it.
+
+  Core Philosophy
+
+  This could literally be a single file, but we split it into 3
+  for clarity:
+  - tracker.py - Counts trades
+  - allocator.py - Decides who gets to trade
+  - rules.py - Configuration
+
+  Total: ~200 lines of code
+
+  Implementation
+
+  tracker.py (50 lines)
+
+  import sqlite3
+  from datetime import datetime, timedelta
+
+  class PDTTracker:
+      def __init__(self, db_path="elpyfi.db"):
+          self.db = db_path
+
+      def get_week_start(self):
+          """Monday 00:00"""
+          today = datetime.now()
+          monday = today - timedelta(days=today.weekday())
+          return monday.replace(hour=0, minute=0, second=0)
+
+      def get_trades_used(self):
+          """How many day trades used this week?"""
+          week_start = self.get_week_start()
+
+          with sqlite3.connect(self.db) as conn:
+              result = conn.execute("""
+                  SELECT COUNT(*) FROM trades 
+                  WHERE is_day_trade = 1 
+                  AND executed_at >= ?
+              """, (week_start,)).fetchone()
+
+          return result[0] if result else 0
+
+      def can_day_trade(self):
+          """Do we have trades left?"""
+          return self.get_trades_used() < 3
+
+      def record_day_trade(self, trade_id):
+          """Mark a trade as day trade"""
+          with sqlite3.connect(self.db) as conn:
+              conn.execute("""
+                  UPDATE trades 
+                  SET is_day_trade = 1 
+                  WHERE id = ?
+              """, (trade_id,))
+
+  allocator.py (80 lines)
+
+  from typing import List, Dict
+
+  class TradeRequest:
+      def __init__(self, strategy: str, confidence: float, 
+  expected_profit: float):
+          self.strategy = strategy
+          self.confidence = confidence
+          self.expected_profit = expected_profit
+          self.score = confidence * expected_profit
+
+  class PDTAllocator:
+      def __init__(self, tracker: PDTTracker):
+          self.tracker = tracker
+          self.pending_requests = []
+
+      def request_day_trade(self, request: TradeRequest):
+          """Strategy wants to day trade"""
+          if self.tracker.can_day_trade():
+              # Immediate approval if we have trades left
+              return True
+          else:
+              # Queue it up
+              self.pending_requests.append(request)
+              return False
+
+      def get_best_request(self) -> TradeRequest:
+          """Who should get the next day trade?"""
+          if not self.pending_requests:
+              return None
+
+          # Simple: highest score wins
+          best = max(self.pending_requests, key=lambda r:
+  r.score)
+          self.pending_requests.remove(best)
+          return best
+
+  rules.py (30 lines)
+
+  # Simple configuration - could be JSON/YAML instead
+
+  PDT_RULES = {
+      "max_day_trades_per_week": 3,
+      "week_starts": "monday",
+      "emergency_reserve": 1,  # Keep 1 trade for stop-losses
+  }
+
+  RISK_RULES = {
+      "max_position_size": 0.02,  # 2% of portfolio
+      "max_daily_loss": 0.05,     # 5% stop
+      "max_open_positions": 10,
+  }
+
+  def can_open_position(portfolio_value: float, 
+  current_positions: int) -> bool:
+      """Basic risk check"""
+      return current_positions <
+  RISK_RULES["max_open_positions"]
+
+  def get_position_size(portfolio_value: float) -> float:
+      """How much to trade"""
+      return portfolio_value * RISK_RULES["max_position_size"]
+
+  main.py (40 lines)
+
+  import asyncio
+  import asyncpg
+  from tracker import PDTTracker
+  from allocator import PDTAllocator, TradeRequest
+
+  async def handle_signal(signal):
+      """Engine sent a signal, should we allow day trade?"""
+
+      # Is this a day trade request?
+      if signal.get("hold_time") == "intraday":
+          request = TradeRequest(
+              strategy=signal["strategy"],
+              confidence=signal["confidence"],
+              expected_profit=signal["expected_profit"]
+          )
+
+          if allocator.request_day_trade(request):
+              # Approved!
+              await notify_engine("day_trade_approved", signal)
+          else:
+              # Convert to swing trade
+              signal["hold_time"] = "overnight"
+              await notify_engine("converted_to_swing", signal)
+
+  async def listen_for_signals():
+      """Subscribe to engine events"""
+      conn = await asyncpg.connect("postgresql://...")
+      await conn.add_listener('signals', lambda *args:
+  handle_signal(args[-1]))
+
+      while True:
+          await asyncio.sleep(1)
+
+  if __name__ == "__main__":
+      tracker = PDTTracker()
+      allocator = PDTAllocator(tracker)
+      asyncio.run(listen_for_signals())
+
+  That's It!
+
+  No over-engineering:
+  - Counts trades: ✓
+  - Enforces limit: ✓
+  - Allocates fairly: ✓
+  - Total complexity: Minimal
+
+  Alternative: Even Simpler
+
+  Honestly, this could just be inside the engine:
+
+  # In elpyfi-engine/execution/pdt.py
+  class PDTManager:
+      def can_day_trade(self):
+          # Check database
+          return self.week_trades < 3
+
+      def execute_signal(self, signal):
+          if signal.is_day_trade and not self.can_day_trade():
+              signal.convert_to_swing()
+          return signal
+
+  Questions to Consider
+
+  1. Do we need a separate service? Maybe not
+  2. Is the allocator needed? Only if multiple strategies
+  compete
+  3. Could this be 1 file? Absolutely
+
+  The separate service makes sense if:
+  - You want to see PDT status without running engine
+  - Multiple engines might share PDT limit
+  - You want separate logging/monitoring
+
+  Otherwise, just put it in the engine!
