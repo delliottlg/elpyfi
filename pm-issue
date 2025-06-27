@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Launch PM Claude MCP server
+# PM Claude Issue Tracker CLI
 
 # Get the directory of this script
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Use our venv Python
-exec "$DIR/venv/bin/python" "$DIR/src/pm_claude_mcp.py"
+# Run the issue tracker
+"$DIR/venv/bin/python" -m src.issue_tracker "$@"

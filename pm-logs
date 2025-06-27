@@ -1,0 +1,54 @@
+#!/bin/bash
+# PM Claude - Log viewer
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+LOG_DIR="$DIR/data/service_logs"
+
+# If no arguments, show help
+if [ $# -eq 0 ]; then
+    echo "Usage: ./pm-logs <service|all> [tail-options]"
+    echo ""
+    echo "Services:"
+    echo "  core       - Core Trading Engine logs"
+    echo "  ai         - AI Analysis Service logs"
+    echo "  api        - REST/WebSocket API logs"
+    echo "  dashboard  - Web Dashboard logs"
+    echo "  all        - All services (multi-tail)"
+    echo ""
+    echo "Examples:"
+    echo "  ./pm-logs core           # Tail core engine logs"
+    echo "  ./pm-logs ai -f          # Follow AI logs in real-time"
+    echo "  ./pm-logs all -f         # Follow all logs"
+    echo "  ./pm-logs core -n 100    # Show last 100 lines of core logs"
+    exit 1
+fi
+
+SERVICE=$1
+shift  # Remove first argument, pass rest to tail
+
+case $SERVICE in
+    core)
+        tail "$@" "$LOG_DIR/elpyfi-core.log"
+        ;;
+    ai)
+        tail "$@" "$LOG_DIR/elpyfi-ai.log"
+        ;;
+    api)
+        tail "$@" "$LOG_DIR/elpyfi-api.log"
+        ;;
+    dashboard)
+        tail "$@" "$LOG_DIR/elpyfi-dashboard.log"
+        ;;
+    all)
+        # Use tail with multiple files
+        echo "=== Following all service logs ==="
+        echo "Press Ctrl+C to stop"
+        echo ""
+        tail "$@" "$LOG_DIR"/*.log
+        ;;
+    *)
+        echo "Unknown service: $SERVICE"
+        echo "Use: core, ai, api, dashboard, or all"
+        exit 1
+        ;;
+esac

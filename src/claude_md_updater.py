@@ -220,6 +220,30 @@ class ClaudeMdUpdater:
         new_content += f"- Automated health monitoring\n"
         new_content += f"- Unified test runner\n"
         
+        # Add issues section if there are any
+        try:
+            from issue_tracker import IssueTracker
+            tracker = IssueTracker(self.base_path)
+            # Match service name - could be 'elpyfi-dashboard' or 'elpyfi-core/elpyfi-engine'
+            service_name = service_id.split('/')[0]
+            issues = tracker.get_issues(service=service_name)
+            
+            if issues:
+                new_content += f"\n### Known Issues\n"
+                for issue in issues:
+                    status_text = {
+                        'open': 'OPEN',
+                        'in_progress': 'IN PROGRESS',
+                        'resolved': 'RESOLVED',
+                        'wont_fix': 'WONT FIX'
+                    }.get(issue.status.value, 'UNKNOWN')
+                    
+                    new_content += f"- [{status_text}] [{issue.id}] {issue.title}\n"
+                    if issue.description:
+                        new_content += f"  - {issue.description}\n"
+        except Exception as e:
+            logger.error(f"Error adding issues section: {e}")
+        
         # If we cut off the original content, add it back
         if pm_section_start != -1:
             pm_section_end = original_content.find("\n## ", pm_section_start + 1)
@@ -252,6 +276,9 @@ def main():
     """Test the CLAUDE.md updater"""
     from pathlib import Path
     import sys
+    
+    # Configure logging
+    logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
     
     # Add parent to path
     sys.path.insert(0, str(Path(__file__).parent))

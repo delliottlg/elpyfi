@@ -12,6 +12,7 @@ import time
 import yaml
 import asyncio
 import psutil
+import socket
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
@@ -51,6 +52,8 @@ class ServiceOrchestrator:
         self.secrets_manager = SecretsManager(base_path / "config")
         self.python_cmd = str(base_path / "venv/bin/python")
         self.health_monitor = HealthMonitor(self)
+        self.pid_dir = base_path / "data" / "pids"
+        self.pid_dir.mkdir(parents=True, exist_ok=True)
         
     def load_config(self):
         """Load service configurations"""
@@ -81,6 +84,80 @@ class ServiceOrchestrator:
                 depends_on=service_data.get('depends_on', []),
                 health_check=service_data.get('health')
             )
+            
+            # Load saved PID if exists
+            self._load_service_pid(service_id)
+    
+    def _save_service_pid(self, service_id: str, pid: int):
+        """Save service PID to file"""
+        pid_file = self.pid_dir / f"{service_id}.pid"
+        pid_file.write_text(str(pid))
+    
+    def _load_service_pid(self, service_id: str):
+        """Load service PID from file and check if process is running"""
+        service = self.services.get(service_id)
+        if not service:
+            return
+            
+        pid_file = self.pid_dir / f"{service_id}.pid"
+        if pid_file.exists():
+            try:
+                pid = int(pid_file.read_text().strip())
+                # Check if process is still running
+                if psutil.pid_exists(pid):
+                    process = psutil.Process(pid)
+                    # Verify it's one of our services
+                    cmdline = ' '.join(process.cmdline())
+                    # Also check process name for next-server
+                    process_name = process.name()
+                    if any(part in cmdline for part in ['engine.py', 'main.py', 'elpyfi']) or 'next-server' in process_name:
+                        service.status = "running"
+                        # Create a minimal process object for compatibility
+                        class PidProcess:
+                            def __init__(self, pid):
+                                self.pid = pid
+                            def poll(self):
+                                try:
+                                    p = psutil.Process(self.pid)
+                                    if p.status() == psutil.STATUS_ZOMBIE:
+                                        return -1
+                                    return None
+                                except psutil.NoSuchProcess:
+                                    return -1
+                            def terminate(self):
+                                try:
+                                    p = psutil.Process(self.pid)
+                                    if p.status() != psutil.STATUS_ZOMBIE:
+                                        p.terminate()
+                                except:
+                                    pass
+                            def kill(self):
+                                try:
+                                    p = psutil.Process(self.pid)
+                                    if p.status() != psutil.STATUS_ZOMBIE:
+                                        p.kill()
+                                except:
+                                    pass
+                            def wait(self, timeout=None):
+                                try:
+                                    p = psutil.Process(self.pid)
+                                    if p.status() != psutil.STATUS_ZOMBIE:
+                                        p.wait(timeout)
+                                except:
+                                    pass
+                        service.process = PidProcess(pid)
+                        return
+            except:
+                pass
+            
+            # PID file exists but process not running, clean up
+            pid_file.unlink()
+    
+    def _remove_service_pid(self, service_id: str):
+        """Remove service PID file"""
+        pid_file = self.pid_dir / f"{service_id}.pid"
+        if pid_file.exists():
+            pid_file.unlink()
     
     def prepare_environment(self, service_id: str) -> Dict[str, str]:
         """Prepare environment variables for a service"""
@@ -104,12 +181,46 @@ class ServiceOrchestrator:
         
         return env
     
+    def _is_port_in_use(self, port: int) -> bool:
+        """Check if a port is already in use"""
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.settimeout(1)
+                result = s.connect_ex(('localhost', port))
+                return result == 0
+        except:
+            return False
+    
+    def _get_service_port(self, service: ServiceConfig) -> Optional[int]:
+        """Extract port number from service health check config"""
+        if not service.health_check or service.health_check.get('type') != 'http':
+            return None
+        
+        endpoint = service.health_check.get('endpoint', '')
+        # Extract port from URL like http://localhost:9000/health
+        try:
+            if ':' in endpoint:
+                port_str = endpoint.split(':')[2].split('/')[0]
+                return int(port_str)
+        except:
+            pass
+        return None
+    
     def start_service(self, service_id: str) -> bool:
         """Start a single service"""
         service = self.services.get(service_id)
         if not service:
             logger.error(f"Unknown service: {service_id}")
             return False
+        
+        # Check if port is already in use
+        port = self._get_service_port(service)
+        if port and self._is_port_in_use(port):
+            logger.warning(f"Port {port} is already in use for {service_id}")
+            # Mark as running since something is already there
+            service.status = "running"
+            logger.info(f"⚠️ {service.name} appears to be already running on port {port}")
+            return True
         
         if service.status == "running":
             logger.info(f"Service {service_id} is already running")
@@ -136,14 +247,27 @@ class ServiceOrchestrator:
             logger.debug(f"Command: {' '.join(service.command)}")
             logger.debug(f"Working dir: {working_dir}")
             
-            service.process = subprocess.Popen(
-                service.command,
-                cwd=working_dir,
-                env=env,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True
-            )
+            # Create log file for this service
+            log_dir = self.base_path / "data" / "service_logs"
+            log_dir.mkdir(parents=True, exist_ok=True)
+            log_file = log_dir / f"{service_id}.log"
+            
+            # Open log file in append mode
+            with open(log_file, 'a') as f:
+                f.write(f"\n{'='*60}\n")
+                f.write(f"Starting {service.name} at {datetime.now()}\n")
+                f.write(f"{'='*60}\n")
+            
+            # Start service with output to log file
+            with open(log_file, 'a') as log_f:
+                service.process = subprocess.Popen(
+                    service.command,
+                    cwd=working_dir,
+                    env=env,
+                    stdout=log_f,
+                    stderr=subprocess.STDOUT,
+                    text=True
+                )
             
             # Give it a moment to start
             time.sleep(2)
@@ -152,6 +276,8 @@ class ServiceOrchestrator:
             if service.process.poll() is None:
                 service.status = "running"
                 logger.info(f"✅ {service.name} started successfully (PID: {service.process.pid})")
+                # Save PID for persistence
+                self._save_service_pid(service_id, service.process.pid)
                 return True
             else:
                 service.status = "failed"
@@ -169,33 +295,71 @@ class ServiceOrchestrator:
     def stop_service(self, service_id: str) -> bool:
         """Stop a single service"""
         service = self.services.get(service_id)
-        if not service or not service.process:
+        if not service:
             return True
         
-        if service.status != "running":
-            return True
-        
-        try:
-            logger.info(f"Stopping {service.name}...")
-            
-            # Try graceful shutdown first
-            service.process.terminate()
+        # If we have a process reference, use it
+        if service.process:
             try:
-                service.process.wait(timeout=10)
-            except subprocess.TimeoutExpired:
-                # Force kill if needed
-                logger.warning(f"Force killing {service.name}")
-                service.process.kill()
-                service.process.wait()
+                logger.info(f"Stopping {service.name}...")
+                
+                # Try graceful shutdown first
+                service.process.terminate()
+                try:
+                    service.process.wait(timeout=10)
+                except subprocess.TimeoutExpired:
+                    # Force kill if needed
+                    logger.warning(f"Force killing {service.name}")
+                    service.process.kill()
+                    service.process.wait()
+                
+                service.status = "stopped"
+                service.process = None
+                self._remove_service_pid(service_id)
+                logger.info(f"✅ {service.name} stopped")
+                return True
+                
+            except Exception as e:
+                logger.error(f"Failed to stop {service_id}: {e}")
+                return False
+        
+        # If no process but port is in use, try to kill by pattern
+        port = self._get_service_port(service)
+        if port and self._is_port_in_use(port):
+            logger.info(f"Attempting to stop external {service.name} process on port {port}")
             
-            service.status = "stopped"
-            service.process = None
-            logger.info(f"✅ {service.name} stopped")
-            return True
+            # Service-specific kill patterns
+            kill_patterns = {
+                'elpyfi-core': ['engine.py'],
+                'elpyfi-ai': ['main.py.*elpyfi-ai'],
+                'elpyfi-api': ['elpyfi_api.main', 'src.elpyfi_api.main'],
+                'elpyfi-dashboard': ['next.*9003', 'npm.*dev.*9003']
+            }
             
-        except Exception as e:
-            logger.error(f"Failed to stop {service_id}: {e}")
-            return False
+            patterns = kill_patterns.get(service_id, [])
+            for pattern in patterns:
+                try:
+                    subprocess.run(['pkill', '-f', pattern], capture_output=True)
+                except:
+                    pass
+            
+            # Give it a moment
+            time.sleep(2)
+            
+            # Check if port is now free
+            if not self._is_port_in_use(port):
+                service.status = "stopped"
+                self._remove_service_pid(service_id)
+                logger.info(f"✅ {service.name} stopped")
+                return True
+            else:
+                logger.error(f"Failed to stop {service.name} - port {port} still in use")
+                return False
+        
+        # Nothing to stop
+        service.status = "stopped"
+        self._remove_service_pid(service_id)
+        return True
     
     def start_all(self, services: Optional[List[str]] = None):
         """Start all services in dependency order"""

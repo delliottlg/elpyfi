@@ -1,0 +1,20 @@
+#!/bin/bash
+# Tail the latest agent log
+
+LOG_DIR="$(dirname "$0")/data/agent_logs"
+
+if [ "$1" ]; then
+    # Tail latest log for specific service
+    LATEST=$(ls -t "$LOG_DIR"/agent_${1}_*.log 2>/dev/null | head -1)
+else
+    # Tail latest log overall
+    LATEST=$(ls -t "$LOG_DIR"/*.log 2>/dev/null | head -1)
+fi
+
+if [ -z "$LATEST" ]; then
+    echo "No agent logs found"
+    exit 1
+fi
+
+echo "Tailing: $LATEST"
+tail -f "$LATEST"

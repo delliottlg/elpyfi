@@ -51,9 +51,9 @@ services:
     path: "./services/elpyfi-api"
     repo: "github.com/your-username/elpyfi-api"
     startup:
-      command: "python -m elpyfi_api.main"
-      working_dir: "src"
-      env_prefix: "API_"
+      command: "python -m src.elpyfi_api.main"
+      working_dir: "."
+      env_prefix: "ELPYFI_"
     health:
       type: "http"
       endpoint: "http://localhost:9002/health"

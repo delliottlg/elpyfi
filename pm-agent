@@ -1,0 +1,9 @@
+#!/bin/bash
+# PM Claude Agent Manager - Orchestrate multiple Claude Code instances
+
+cd "$(dirname "$0")"
+source venv/bin/activate
+
+export PYTHONPATH="${PWD}/src:${PYTHONPATH}"
+
+python -m agent_cli "$@"

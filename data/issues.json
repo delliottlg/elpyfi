@@ -1,0 +1,215 @@
+{
+  "ea138c82": {
+    "id": "ea138c82",
+    "service": "elpyfi-dashboard",
+    "title": "Hydration warning with Dark Reader",
+    "description": "Dark Reader browser extension causes hydration mismatch in Navigation.tsx SVG elements",
+    "status": "resolved",
+    "severity": "low",
+    "created_at": "2025-06-25T19:09:31.875839",
+    "updated_at": "2025-06-25T21:10:11.487476",
+    "tags": [
+      "browser-extension",
+      "hydration",
+      "next.js"
+    ]
+  },
+  "c22f137b": {
+    "id": "c22f137b",
+    "service": "elpyfi-dashboard",
+    "title": "Known Issues section missing",
+    "description": "CLAUDE.md updater not adding issues - need to check service ID matching",
+    "status": "resolved",
+    "severity": "medium",
+    "created_at": "2025-06-25T19:11:33.544198",
+    "updated_at": "2025-06-25T19:24:46.386901",
+    "tags": []
+  },
+  "be970076": {
+    "id": "be970076",
+    "service": "pm-claude",
+    "title": "PostgreSQL database required for services",
+    "description": "Services need PostgreSQL database named 'elpyfi' with schema from elpyfi-api/create_tables.sql. Engine writes to it, API reads from it. Connection strings in secrets.yaml need to match actual database.",
+    "status": "open",
+    "severity": "high",
+    "created_at": "2025-06-25T19:37:42.861148",
+    "updated_at": "2025-06-25T19:37:42.861156",
+    "tags": []
+  },
+  "54d618c6": {
+    "id": "54d618c6",
+    "service": "elpyfi-api",
+    "title": "Clean up .env file to only include ELPYFI_ prefixed variables",
+    "description": "Remove all the exposed API keys (OpenAI, Anthropic, Alpaca, etc) that belong to other services. PM Claude's secrets.yaml handles those. Only keep ELPYFI_DATABASE_URL, ELPYFI_API_KEYS, ELPYFI_CORS_ORIGINS, ELPYFI_PORT",
+    "status": "resolved",
+    "severity": "high",
+    "created_at": "2025-06-25T20:34:21.746898",
+    "updated_at": "2025-06-25T21:21:11.597696",
+    "tags": []
+  },
+  "64885e18": {
+    "id": "64885e18",
+    "service": "elpyfi-api",
+    "title": "Fix Pydantic v2 deprecation warning in config.py",
+    "description": "Update BaseSettings usage to new ConfigDict pattern. Quick 5-line fix.",
+    "status": "resolved",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:34:30.612563",
+    "updated_at": "2025-06-25T23:10:26.367133",
+    "tags": []
+  },
+  "2a39ccce": {
+    "id": "2a39ccce",
+    "service": "elpyfi-api",
+    "title": "Add database connectivity check to /health endpoint",
+    "description": "Currently just returns OK. Should do a simple SELECT 1 query to verify database is actually accessible. ~10 lines.",
+    "status": "open",
+    "severity": "high",
+    "created_at": "2025-06-25T20:34:38.406454",
+    "updated_at": "2025-06-25T20:34:38.406467",
+    "tags": []
+  },
+  "53e8d644": {
+    "id": "53e8d644",
+    "service": "elpyfi-api",
+    "title": "Add limit parameter validation to /signals/recent endpoint",
+    "description": "Currently has no bounds checking. Cap at reasonable max (like 1000) to prevent memory issues. 3-line fix.",
+    "status": "resolved",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:34:44.618722",
+    "updated_at": "2025-06-25T23:10:30.225749",
+    "tags": []
+  },
+  "d3a61355": {
+    "id": "d3a61355",
+    "service": "elpyfi-api",
+    "title": "Fix asyncpg connection cleanup",
+    "description": "Ensure database connections are properly closed after each request to prevent connection leaks. Add proper cleanup in get_db() dependency. ~5 lines.",
+    "status": "resolved",
+    "severity": "high",
+    "created_at": "2025-06-25T20:34:51.637208",
+    "updated_at": "2025-06-25T23:51:38.382160",
+    "tags": []
+  },
+  "31298f7b": {
+    "id": "31298f7b",
+    "service": "elpyfi-core",
+    "title": "Remove old local venv and use PM Claude's shared environment",
+    "description": "Delete the local venv/ directory in elpyfi-engine/. When running Python, use /Users/d/Documents/projects/elpyfi-pm-claude/venv/bin/python or activate the shared venv with: source /Users/d/Documents/projects/elpyfi-pm-claude/venv/bin/activate",
+    "status": "open",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:45:45.500230",
+    "updated_at": "2025-06-25T20:45:45.500241",
+    "tags": []
+  },
+  "bae0c1a4": {
+    "id": "bae0c1a4",
+    "service": "elpyfi-ai",
+    "title": "Remove old local venv and use PM Claude's shared environment",
+    "description": "Delete the local venv/ directory. When running Python, use /Users/d/Documents/projects/elpyfi-pm-claude/venv/bin/python or activate the shared venv with: source /Users/d/Documents/projects/elpyfi-pm-claude/venv/bin/activate",
+    "status": "open",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:45:53.869625",
+    "updated_at": "2025-06-25T20:45:53.869633",
+    "tags": []
+  },
+  "5f943e8d": {
+    "id": "5f943e8d",
+    "service": "elpyfi-api",
+    "title": "Remove old local venv and use PM Claude's shared environment",
+    "description": "Delete the local venv/ directory. When running Python, use /Users/d/Documents/projects/elpyfi-pm-claude/venv/bin/python or activate the shared venv with: source /Users/d/Documents/projects/elpyfi-pm-claude/venv/bin/activate",
+    "status": "resolved",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:46:00.939343",
+    "updated_at": "2025-06-25T23:26:34.214115",
+    "tags": []
+  },
+  "748fc1fc": {
+    "id": "748fc1fc",
+    "service": "elpyfi-core",
+    "title": "Add PM Claude service status check on startup",
+    "description": "Add code to check if other services are running by looking for PM_CLAUDE_SERVICE_STATUS environment variable or calling PM Claude's status endpoint. This helps coordinate startup dependencies.",
+    "status": "open",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:55:19.728947",
+    "updated_at": "2025-06-25T20:55:19.728956",
+    "tags": []
+  },
+  "0d682431": {
+    "id": "0d682431",
+    "service": "elpyfi-core",
+    "title": "Improve database schema mismatch error handling",
+    "description": "While engine.py handles missing order_id column gracefully, add proper warning logs and fallback behavior. Consider adding column existence check on startup to log clear warnings about schema issues.",
+    "status": "resolved",
+    "severity": "low",
+    "created_at": "2025-06-25T20:55:27.237155",
+    "updated_at": "2025-06-26T00:01:57.537756",
+    "tags": []
+  },
+  "cc5b65c0": {
+    "id": "cc5b65c0",
+    "service": "pm-claude",
+    "title": "Add service status environment variables for inter-service awareness",
+    "description": "Set PM_CLAUDE_SERVICE_NAME and PM_CLAUDE_SERVICE_STATUS environment variables when starting services so they can see what other services are running. This helps services coordinate startup and check dependencies.",
+    "status": "open",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:56:09.106279",
+    "updated_at": "2025-06-25T20:56:09.106286",
+    "tags": []
+  },
+  "59520bf4": {
+    "id": "59520bf4",
+    "service": "elpyfi-ai",
+    "title": "Update Pydantic .dict() to .model_dump() for v2 compatibility",
+    "description": "In main.py lines 157-158, using deprecated .dict() method. Update to .model_dump() to avoid deprecation warnings and prepare for Pydantic v2. Simple 2-line change.",
+    "status": "open",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:58:36.719982",
+    "updated_at": "2025-06-25T20:58:36.719991",
+    "tags": []
+  },
+  "d2926233": {
+    "id": "d2926233",
+    "service": "elpyfi-ai",
+    "title": "Add environment variable validation on startup",
+    "description": "Add validation for required env vars like ANTHROPIC_API_KEY in ai_analyzer.py. Should fail fast with clear error message if API keys missing rather than runtime failures. ~10 lines.",
+    "status": "open",
+    "severity": "high",
+    "created_at": "2025-06-25T20:58:43.151950",
+    "updated_at": "2025-06-25T20:58:43.151956",
+    "tags": []
+  },
+  "8ede2843": {
+    "id": "8ede2843",
+    "service": "elpyfi-ai",
+    "title": "Add proper logging configuration instead of print statements",
+    "description": "Replace any print() statements with proper logging using Python's logging module. Configure appropriate log levels (DEBUG, INFO, ERROR) for better production debugging and monitoring.",
+    "status": "resolved",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:58:49.753299",
+    "updated_at": "2025-06-25T23:10:42.026713",
+    "tags": []
+  },
+  "677c187a": {
+    "id": "677c187a",
+    "service": "elpyfi-dashboard",
+    "title": "Add error boundary components to prevent full app crashes",
+    "description": "Wrap main components in React error boundaries to catch and display errors gracefully instead of white screen. Add to PositionsTable, SignalsTable, and PerformanceChart components. ~50 lines total.",
+    "status": "resolved",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:59:19.483751",
+    "updated_at": "2025-06-25T23:16:06.986647",
+    "tags": []
+  },
+  "818d735b": {
+    "id": "818d735b",
+    "service": "elpyfi-dashboard",
+    "title": "Add loading states and error handling for API calls",
+    "description": "SWR hooks in components don't show loading spinners or error messages. Add proper loading states and error displays for better UX when API is down or slow. ~20 lines across components.",
+    "status": "resolved",
+    "severity": "medium",
+    "created_at": "2025-06-25T20:59:25.321063",
+    "updated_at": "2025-06-25T23:15:45.048700",
+    "tags": []
+  }
+}
