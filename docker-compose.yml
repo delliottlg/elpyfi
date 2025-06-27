@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: elpyfi
+      POSTGRES_USER: ${DB_USER:-elpyfi}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U elpyfi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  core:
+    build: ./services/elpyfi-core/elpyfi-engine
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-elpyfi}:${DB_PASSWORD}@postgres:5432/elpyfi
+      CORE_ALPACA_API_KEY: ${ALPACA_API_KEY}
+      CORE_ALPACA_SECRET_KEY: ${ALPACA_SECRET_KEY}
+      CORE_ALPACA_BASE_URL: ${ALPACA_BASE_URL:-https://paper-api.alpaca.markets}
+    volumes:
+      - ./data/logs/core:/app/logs
+    restart: unless-stopped
+
+  ai:
+    build: ./services/elpyfi-ai
+    depends_on:
+      postgres:
+        condition: service_healthy
+      core:
+        condition: service_started
+    ports:
+      - "9000:9000"
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-elpyfi}:${DB_PASSWORD}@postgres:5432/elpyfi
+      AI_ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      AI_OPENAI_API_KEY: ${OPENAI_API_KEY}
+    volumes:
+      - ./data/logs/ai:/app/logs
+    restart: unless-stopped
+
+  api:
+    build: ./services/elpyfi-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      core:
+        condition: service_started
+    ports:
+      - "9002:9002"
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-elpyfi}:${DB_PASSWORD}@postgres:5432/elpyfi
+      ELPYFI_API_KEYS: ${API_KEYS}
+    volumes:
+      - ./data/logs/api:/app/logs
+    restart: unless-stopped
+
+  dashboard:
+    build: ./services/elpyfi-dashboard
+    depends_on:
+      api:
+        condition: service_started
+    ports:
+      - "9003:9003"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: ${API_BASE_URL:-http://api:9002}
+      NEXT_PUBLIC_WEBSOCKET_URL: ${WEBSOCKET_URL:-ws://api:9002}
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
