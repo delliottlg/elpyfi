@@ -1,5 +1,5 @@
 # Service repositories (managed separately)
-services/*/
+# services/*/  # Commented out - we need these in git for deployment!
 
 # Worktrees for agents
 worktrees/

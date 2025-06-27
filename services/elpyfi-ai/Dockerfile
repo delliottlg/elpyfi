@@ -19,8 +19,8 @@ COPY . .
 RUN useradd -m -u 1000 elpyfi && chown -R elpyfi:elpyfi /app
 USER elpyfi
 
-# Expose port
-EXPOSE 9000
+# Expose port (Fly.io uses 8080 internally)
+EXPOSE 8080
 
 # Run the AI service
 CMD ["python", "main.py"]

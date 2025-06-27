@@ -1,0 +1,28 @@
+# Fly.io config for Core Trading Engine
+app = "elpyfi-core"
+primary_region = "sjc"
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+[build]
+  dockerfile = "services/elpyfi-core/elpyfi-engine/Dockerfile"
+
+[env]
+  PORT = "8080"
+  CORE_ALPACA_BASE_URL = "https://paper-api.alpaca.markets"
+
+[processes]
+  engine = "python engine.py"
+
+[[services]]
+  processes = ["engine"]
+  internal_port = 8080
+  protocol = "tcp"
+  
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+  
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
