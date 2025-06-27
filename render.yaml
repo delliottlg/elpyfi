@@ -21,7 +21,7 @@ services:
   - type: worker
     name: elpyfi-core
     runtime: python
-    rootDirectory: services/elpyfi-core/elpyfi-engine
+    rootDir: services/elpyfi-core/elpyfi-engine
     buildCommand: pip install -r requirements.txt
     startCommand: python engine.py
     envVars:
@@ -41,7 +41,7 @@ services:
   - type: web
     name: elpyfi-ai
     runtime: python
-    rootDirectory: services/elpyfi-ai
+    rootDir: services/elpyfi-ai
     buildCommand: pip install -r requirements.txt
     startCommand: python main.py
     envVars:
@@ -63,7 +63,7 @@ services:
   - type: web
     name: elpyfi-api
     runtime: python
-    rootDirectory: services/elpyfi-api
+    rootDir: services/elpyfi-api
     buildCommand: pip install -r requirements.txt
     startCommand: python -m src.elpyfi_api.main
     envVars:
@@ -83,7 +83,7 @@ services:
   - type: web
     name: elpyfi-dashboard
     runtime: node
-    rootDirectory: services/elpyfi-dashboard
+    rootDir: services/elpyfi-dashboard
     buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
